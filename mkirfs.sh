@@ -48,11 +48,11 @@ helpscreen() {
 endhelp
 }
 
-confdir="/etc/cinitramfs"
-extrafilesdir="${confdir}/root"
-filelist="${confdir}/files"
-modulelist="${confdir}/modules"
-firmwarelist="${confdir}/firmwares"
+# The only config file.
+# This is needed when this script is
+# used as drop-in script in
+# /etc/kernel/postinst.d/ -directory
+etckernellist="/etc/kernel/initramfs.lst"
 
 firmwaredir="/lib/firmware"
 cpiocmd=(cpio --create --format=newc)
@@ -288,12 +288,12 @@ then
 	kver="$1"
 	destdir="$(dirname "$2")"
 	output="${destdir%/}/initc-${kver}.img"
-	if [[ -r "/etc/kernel/initc.lst" ]]
+	if [[ -r "$etckernellist" ]]
 	then
-		egrep --no-filename --invert-match '^([[:space:]]*#|$)' /etc/kernel/initc.lst 2> /dev/null | \
+		egrep --no-filename --invert-match '^([[:space:]]*#|$)' "$etckernellist" 2> /dev/null | \
 			list2cpio | "${compressor[@]}" > "${output}"
 	else
-		echo "file /etc/kernel/initc.lst does not exist or isn't readable"
+		echo "file ${etckernellist} does not exist or isn't readable" 1>&2
 	fi
 	
 elif [[ $1 && ${1:0:1} != "-" ]]
