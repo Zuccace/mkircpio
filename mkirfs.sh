@@ -12,7 +12,7 @@ helpscreen() {
 		from standard input and packs all them into a
 		cpio archive for use as an initramfs.
 		Using --output <output cpio> the destination for the
-		cpio can be chosen.
+		cpio can be chosen. Otherwise its stdout.
 
 		If a directory is given its content will be copied
 		to the _root_ of the cpio.
@@ -41,9 +41,19 @@ helpscreen() {
 		Firware files can be added using absolute path or
 		relative to ${firmwaredir}.
 
+		Compression method can be changed with --compressor
+		switch. It takes arguments as: command arg1 arg2 ... argN
+		You need to terminate compressor command with --
+		(two dashes) unless it's the last switch on the
+		command line. Compression command is expected to take
+		cpio data from stdin and it is expected to output
+		to stdout.
+
 		This script does _not_ provide any premade or automatic
 		generation of init/linuxrc script which is needed to
 		boot the system from initramfs.
+
+		Oh. And --verbose does what you think it does. ;)
 		
 endhelp
 }
@@ -56,8 +66,8 @@ etckernellist="/etc/kernel/initramfs.lst"
 
 firmwaredir="/lib/firmware"
 cpiocmd=(cpio --create --format=newc)
-compressor=(pigz -11 --iterations 16 --maxsplits 8 --blocksize 1024 --stdout --keep)
-#compressor=(gzip --best --stdout)
+#compressor=(pigz -11 --iterations 16 --maxsplits 8 --blocksize 1024 --stdout --keep)
+compressor=(gzip --best --stdout)
 modprinter=(awk -v "d=${firmwaredir}" '(index($1,d) != 1)')
 declare -A modarr
 
@@ -322,6 +332,10 @@ else
 				cpiocmd+=(--verbose)
 				verbose=1
 			;;
+			"--kver")
+				kver="$2"
+				shift
+			;;
 			"--compressor")
 				shift
 				compressor=()
@@ -330,17 +344,15 @@ else
 				do
 					compressor+=("$1")
 					shift
-				done
-				
-				continue # Avoid shifting.
+				done	
 			;;
 			"--help")
 				helpscreen
 				exit 0
 			;;
 			*)
-				msg "Unknown switch: $1"
 				helpscreen
+				msg "Unknown switch: $1"
 				err
 			;;
 		esac
