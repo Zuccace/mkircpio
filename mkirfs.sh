@@ -38,7 +38,7 @@ helpscreen() {
 		the default 'uname -r' ($(uname -r))
 		kernel version.
 		
-		Firware files can be added using absolute path or
+		Firmware files can be added using absolute path or
 		relative to ${firmwaredir}.
 
 		Compression method can be changed with --compressor
