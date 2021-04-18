@@ -5,7 +5,11 @@ helpscreen() {
 	cat <<- endhelp
 		$(realpath "$0") usage.
 
-		Varsion 0.0.1alpha - "very beta"
+		Version 0.0.1beta - "still beta"
+
+		NOTE: configuration files may be ranamed
+		in the future. This note will be removed after
+		things have stabilized more.
 		
 		Takes a list (\\n seperated) of files,
 		directories, kernel modules and firmware files
